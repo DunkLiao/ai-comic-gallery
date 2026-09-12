@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { UploadForm } from "@/components/UploadForm";
 import { LogoutButton } from "@/components/LogoutButton";
-import { getThemes } from "@/lib/gallery";
+import { getThemeImages, getThemes } from "@/lib/gallery";
 
 export const dynamic = "force-dynamic";
 
@@ -11,11 +11,13 @@ export default async function UploadPage({
   searchParams: Promise<{ slug?: string }>;
 }) {
   const { slug } = await searchParams;
-  const themes = (await getThemes()).map((t) => ({
-    slug: t.slug,
-    title: t.title,
-    count: 0,
-  }));
+  const themes = await Promise.all(
+    (await getThemes()).map(async (t) => ({
+      slug: t.slug,
+      title: t.title,
+      count: (await getThemeImages(t.slug)).length,
+    })),
+  );
 
   return (
     <div className="mx-auto max-w-3xl px-6 py-12">

@@ -58,7 +58,7 @@ export async function getThemeImages(slug: string): Promise<GalleryImage[]> {
   const c = getCloudinary();
   try {
     const res = (await c.search
-      .expression(`folder:${THEME_FOLDER}/${slug}`)
+      .expression(`resource_type:image AND public_id:${THEME_FOLDER}/${slug}/*`)
       .with_field("context")
       .max_results(500)
       .execute()) as { resources: RawResource[] };

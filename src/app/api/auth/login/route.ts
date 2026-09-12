@@ -36,8 +36,7 @@ export async function POST(request: Request) {
   const password = body.password ?? "";
 
   const okUser = username === requireEnv("ADMIN_USERNAME");
-  const storedHash = process.env.ADMIN_PASSWORD_HASH ?? "";
-  const okPass = storedHash ? bcrypt.compareSync(password, storedHash) : false;
+  const okPass = bcrypt.compareSync(password, requireEnv("ADMIN_PASSWORD_HASH"));
 
   if (!okUser || !okPass) {
     const e = attempts.get(ip) ?? { count: 0, first: now };

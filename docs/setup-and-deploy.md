@@ -41,7 +41,7 @@ cp .env.example .env.local
 | `CLOUDINARY_API_SECRET` | Cloudinary API Secret | 同上（點 Reveal 顯示） |
 | `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` | 給瀏覽器端 image loader 用，與 `CLOUDINARY_CLOUD_NAME` 相同 | 同上 |
 
-> **重要**：`ADMIN_PASSWORD_HASH` 存的是**雜湊**，不是明文密碼。明文密碼不需要寫進任何檔案。
+> **重要**：`ADMIN_PASSWORD_HASH` 存的是**雜湊**，不是明文密碼。登入時請輸入原本的明文密碼，不是 hash。
 
 ### 產生密碼雜湊
 
@@ -49,7 +49,11 @@ cp .env.example .env.local
 node scripts/hash-password.mjs "你想要的密碼"
 ```
 
-輸出類似 `$2b$10$abcd...`，整段貼到 `ADMIN_PASSWORD_HASH`。
+輸出類似 `$2b$10$abcd...`。若貼到 `.env.local`，請把 `$` 跳脫成 `\$`，例如：
+
+```env
+ADMIN_PASSWORD_HASH=\$2b\$10\$abcd...
+```
 
 ### 產生 Session 密鑰
 
@@ -184,7 +188,7 @@ A: 確認 `CLOUDINARY_*` 三個變數都填了，且 `comic-gallery/themes.json`
 A: 多半是 `CLOUDINARY_API_SECRET` 填錯，server 簽不出有效簽章。檢查 Vercel 環境變數是否正確。
 
 **Q: 登入一直失敗、但又沒報「密碼錯誤」？**
-A: 可能是 `ADMIN_PASSWORD_HASH` 為空或格式錯誤（必須以 `$2b$` 開頭）。重新跑 hash-password 腳本。
+A: 確認 `ADMIN_PASSWORD_HASH` 是透過 `scripts/hash-password.mjs` 產生的 bcrypt hash。若寫在 `.env.local`，請把 `$` 寫成 `\$`，修改後重新啟動本機 dev server 或重新部署。
 
 **Q: 部署後前台沒更新？**
 A: 前台走 ISR 快取（1 小時）。後台上傳/改主題會自動觸發 revalidate；若想立即刷新，可在 `/admin` 做任意一次編輯儲存。
